@@ -33,7 +33,7 @@
     
     [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(updateImage) userInfo:nil repeats:YES];
     
-    NSURL *url = [[NSURL alloc] initWithString:@"http://pic1.desk.chinaz.com/file/201206/7/jiaqingczmnwp2.jpg"];
+    NSURL *url = [[NSURL alloc] initWithString:@"http://b.zol-img.com.cn/desk/bizhi/image/1/1920x1200/1348810232493.jpg"];
     _webImage = [[SvIncrementallyImage alloc] initWithURL:url];
 }
 
