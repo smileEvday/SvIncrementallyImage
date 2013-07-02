@@ -18,9 +18,11 @@
     
     NSMutableData   *_recieveData;
     long long       _expectedLeght;
+    bool            _isLoadFinished;
 }
 
 @property (nonatomic, retain) UIImage *image;
+@property (nonatomic, retain) UIImage *thumbImage;
 
 @end
 
@@ -28,6 +30,7 @@
 
 @synthesize imageURL = _imageURL;
 @synthesize image    = _image;
+@synthesize thumbImage = _thumbImage;
 
 - (id)initWithURL:(NSURL *)imageURL
 {
@@ -41,6 +44,7 @@
         _incrementallyImgSource = CGImageSourceCreateIncremental(NULL);
         
         _recieveData = [[NSMutableData alloc] init];
+        _isLoadFinished = false;
     }
     
     return self;
@@ -51,6 +55,8 @@
     [_request release]; _request = nil;
     [_conn release];    _conn = nil;
     [_recieveData release]; _recieveData = nil;
+    [_image release]; _image = nil;
+    [_thumbImage release]; _thumbImage = nil;
     
     CFRelease(_incrementallyImgSource); _incrementallyImgSource = NULL;
     
@@ -85,28 +91,28 @@
 {
     NSLog(@"Connection Loading Finished!!!");
     
-    CGImageSourceUpdateData(_incrementallyImgSource, (CFDataRef)_recieveData, true);
-    CGImageRef imageRef = CGImageSourceCreateImageAtIndex(_incrementallyImgSource, 0, NULL);
-    self.image = [UIImage imageWithCGImage:imageRef];
+    // if download image data not complete, create final image
+    if (!_isLoadFinished) {
+        CGImageSourceUpdateData(_incrementallyImgSource, (CFDataRef)_recieveData, _isLoadFinished);
+        CGImageRef imageRef = CGImageSourceCreateImageAtIndex(_incrementallyImgSource, 0, NULL);
+        self.image = [UIImage imageWithCGImage:imageRef];
+        CGImageRelease(imageRef);
+    }
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
 {
-    NSLog(@"recieve data: %@", data);
-    
     [_recieveData appendData:data];
     
-    bool isFinished = false;
+    _isLoadFinished = false;
     if (_expectedLeght == _recieveData.length) {
-        isFinished = true;
+        _isLoadFinished = true;
     }
     
-    CGImageSourceUpdateData(_incrementallyImgSource, (CFDataRef)_recieveData, true);
+    CGImageSourceUpdateData(_incrementallyImgSource, (CFDataRef)_recieveData, _isLoadFinished);
     CGImageRef imageRef = CGImageSourceCreateImageAtIndex(_incrementallyImgSource, 0, NULL);
     self.image = [UIImage imageWithCGImage:imageRef];
-    
-    CFRelease(_incrementallyImgSource);
-    _incrementallyImgSource = CGImageSourceCreateIncremental(NULL);
+    CGImageRelease(imageRef);
 }
 
 @end

@@ -10,6 +10,7 @@
 #import "SvIncrementallyImage.h"
 
 @interface SvIncrementallyViewController () {
+    UIImageView *_imageThumb;
     UIImageView *_imageV;
     SvIncrementallyImage *_webImage;
 }
@@ -26,6 +27,7 @@
     _imageV = [[UIImageView alloc] initWithFrame:self.view.bounds];
     _imageV.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     _imageV.contentMode = UIViewContentModeScaleAspectFit;
+    _imageV.backgroundColor = [UIColor clearColor];
     [self.view addSubview:_imageV];
     [_imageV release];
     
